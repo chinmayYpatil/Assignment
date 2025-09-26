@@ -16,11 +16,16 @@ class JarViewModel : ViewModel() {
     val listStringData: StateFlow<List<ComputerItem>>
         get() = _listStringData
 
+    private val rawData= MutableStateFlow<List<ComputerItem>>(emptyList())
+
     private val repository: JarRepository = JarRepositoryImpl(createRetrofit())
 
     fun fetchData() {
         viewModelScope.launch {
-            repository.fetchResults()
+            repository.fetchResults().collect { results ->
+                rawData.value=results
+                _listStringData.value=results
+            }
         }
     }
 }

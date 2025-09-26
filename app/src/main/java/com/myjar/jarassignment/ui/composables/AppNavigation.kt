@@ -89,6 +89,10 @@ fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Text(text = item.name, fontWeight = FontWeight.Bold, color = Color.Black)
+        item.data?.let{data->
+            data.color?.let{Text(text="Color: $it")}
+            data.price?.let{Text(text="price: \$${it}")}
+        }
     }
 }
 
@@ -96,10 +100,8 @@ fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
 fun ItemDetailScreen(itemId: String?) {
     // Fetch the item details based on the itemId
     // Here, you can fetch it from the ViewModel or repository
-    Text(
-        text = "Item Details for ID: $itemId",
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    )
+    Column {
+
+    }
+
 }
