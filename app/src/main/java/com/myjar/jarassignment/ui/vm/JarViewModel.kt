@@ -9,6 +9,7 @@ import com.myjar.jarassignment.data.repository.JarRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.http.Query
 
 class JarViewModel : ViewModel() {
 
@@ -27,5 +28,12 @@ class JarViewModel : ViewModel() {
                 _listStringData.value=results
             }
         }
+    }
+    private val _serchQuery= MutableStateFlow("")
+    val searchQuery: StateFlow<String> get()= _serchQuery
+    fun updateSearchQuery(query: String){
+        _serchQuery.value=query
+        _listStringData.value=if(query.isBlank()) rawData.value
+        else rawData.value.filter { it.name.contains(query,ignoreCase=true)}
     }
 }

@@ -1,5 +1,6 @@
 package com.myjar.jarassignment.ui.composables
 
+import android.R.attr.onClick
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,7 +48,7 @@ fun AppNavigation(
         }
         composable("item_detail/{itemId}") { backStackEntry ->
             val itemId = backStackEntry.arguments?.getString("itemId")
-            ItemDetailScreen(itemId = itemId)
+            ItemDetailScreen(itemId = itemId, navController=navController)
         }
     }
 }
@@ -59,10 +62,15 @@ fun ItemListScreen(
 ) {
     val items = viewModel.listStringData.collectAsState()
 
+    val searchQuery= viewModel.searchQuery.collectAsState()
+
+    Spacer(modifier = Modifier.height(90.dp))
+
     if (navigate.value.isNotBlank()) {
         val currRoute = navController.currentDestination?.route.orEmpty()
         if (!currRoute.contains("item_detail")) {
             navController.navigate("item_detail/${navigate.value}")
+            navigate.value=""
         }
     }
     LazyColumn(
@@ -70,6 +78,15 @@ fun ItemListScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        item {
+            TextField(
+                value=searchQuery.value,
+                onValueChange = {viewModel.updateSearchQuery(it)},
+                label={ Text(text = "Search")},
+                modifier = Modifier.fillMaxWidth().padding(bottom=8.dp)
+            )
+        }
+
         items(items.value) { item ->
             ItemCard(
                 item = item,
@@ -85,23 +102,26 @@ fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(12.dp)
             .clickable { onClick() }
     ) {
         Text(text = item.name, fontWeight = FontWeight.Bold, color = Color.Black)
         item.data?.let{data->
             data.color?.let{Text(text="Color: $it")}
             data.price?.let{Text(text="price: \$${it}")}
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
 @Composable
-fun ItemDetailScreen(itemId: String?) {
+fun ItemDetailScreen(itemId: String?, navController: NavHostController) {
     // Fetch the item details based on the itemId
     // Here, you can fetch it from the ViewModel or repository
-    Column {
-
-    }
-
+    Text(
+        text = "Item Details for ID: $itemId",
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    )
 }
